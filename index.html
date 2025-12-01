@@ -5,6 +5,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <title>Englannin kielen harjoitukset - Interaktiivinen sovellus</title>
         <style>
+            :root {
+                --primary-color: #1e40af;
+                --primary-dark: #1e3a8a;
+                --accent-color: #dc2626;
+                --accent-light: #ef4444;
+                --success-color: #27ae60;
+                --success-bg: #d4edda;
+                --success-text: #155724;
+                --error-color: #e74c3c;
+                --error-bg: #f8d7da;
+                --error-text: #721c24;
+                --neutral-bg: #f8f9fa;
+                --neutral-gray: #95a5a6;
+                --neutral-dark: #7f8c8d;
+                --text-dark: #2c3e50;
+                --hint-color: #999;
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -13,7 +31,7 @@
 
             body {
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-color) 50%, var(--primary-dark) 100%);
                 min-height: 100vh;
                 padding: 20px;
             }
@@ -28,7 +46,7 @@
             }
 
             .header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-color) 100%);
                 color: white;
                 padding: 30px;
                 text-align: center;
@@ -44,7 +62,7 @@
                 justify-content: center;
                 gap: 10px;
                 padding: 20px;
-                background: #f8f9fa;
+                background: var(--neutral-bg);
                 flex-wrap: wrap;
             }
 
@@ -58,7 +76,7 @@
             .nav-btn {
                 padding: 12px 24px;
                 border: none;
-                background: #667eea;
+                background: var(--primary-color);
                 color: white;
                 border-radius: 25px;
                 cursor: pointer;
@@ -68,13 +86,13 @@
             }
 
             .nav-btn:hover {
-                background: #764ba2;
+                background: var(--accent-color);
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
 
             .nav-btn.active {
-                background: #764ba2;
+                background: var(--accent-color);
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
 
@@ -156,12 +174,12 @@
             }
 
             .flashcard-front {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
                 color: white;
             }
 
             .flashcard-back {
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                background: linear-gradient(135deg, var(--accent-light) 0%, var(--primary-dark) 100%);
                 color: white;
                 transform: rotateY(180deg);
             }
@@ -183,12 +201,12 @@
             }
 
             .prev-btn {
-                background: #95a5a6;
+                background: var(--neutral-gray);
                 color: white;
             }
 
             .next-btn {
-                background: #27ae60;
+                background: var(--success-color);
                 color: white;
             }
 
@@ -199,28 +217,28 @@
 
             .card-counter {
                 font-size: 18px;
-                color: #666;
+                color: var(--text-dark);
                 font-weight: bold;
             }
 
             .hint {
-                color: #999;
+                color: var(--hint-color);
                 font-style: italic;
                 margin-top: 20px;
             }
 
             /* Exercise styles */
             .exercise-box {
-                background: #f8f9fa;
+                background: var(--neutral-bg);
                 padding: 25px;
                 border-radius: 15px;
                 margin: 20px 0;
-                border-left: 5px solid #667eea;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             }
 
             .exercise-title {
                 font-size: 1.5em;
-                color: #667eea;
+                color: var(--primary-color);
                 margin-bottom: 20px;
                 font-weight: bold;
             }
@@ -254,7 +272,7 @@
             .question-text {
                 font-weight: bold;
                 margin-bottom: 10px;
-                color: #2c3e50;
+                color: var(--text-dark);
             }
 
             input[type="text"] {
@@ -268,23 +286,23 @@
 
             input[type="text"]:focus {
                 outline: none;
-                border-color: #667eea;
+                border-color: var(--primary-color);
             }
 
             input.correct {
-                border-color: #27ae60;
-                background: #d4edda;
+                border-color: var(--success-color);
+                background: var(--success-bg);
             }
 
             input.incorrect {
-                border-color: #e74c3c;
-                background: #f8d7da;
+                border-color: var(--error-color);
+                background: var(--error-bg);
             }
 
             .check-btn {
                 padding: 15px 40px;
                 border: none;
-                background: #667eea;
+                background: var(--primary-color);
                 color: white;
                 border-radius: 25px;
                 font-size: 18px;
@@ -295,7 +313,7 @@
             }
 
             .check-btn:hover {
-                background: #764ba2;
+                background: var(--accent-color);
                 transform: translateY(-2px);
             }
 
@@ -308,13 +326,13 @@
             }
 
             .feedback.success {
-                background: #d4edda;
-                color: #155724;
+                background: var(--success-bg);
+                color: var(--success-text);
             }
 
             .feedback.error {
-                background: #f8d7da;
-                color: #721c24;
+                background: var(--error-bg);
+                color: var(--error-text);
             }
 
             /* Matching exercise styles */
@@ -342,24 +360,24 @@
             }
 
             .matching-item.selected {
-                border-color: #667eea;
+                border-color: var(--primary-color);
                 background: #e3f2fd;
             }
 
             .matching-item.correct {
-                border-color: #27ae60;
-                background: #d4edda;
+                border-color: var(--success-color);
+                background: var(--success-bg);
             }
 
             .matching-item.incorrect {
-                border-color: #e74c3c;
-                background: #f8d7da;
+                border-color: var(--error-color);
+                background: var(--error-bg);
             }
 
             .reset-btn {
                 padding: 12px 30px;
                 border: none;
-                background: #95a5a6;
+                background: var(--neutral-gray);
                 color: white;
                 border-radius: 25px;
                 font-size: 16px;
@@ -370,12 +388,12 @@
             }
 
             .reset-btn:hover {
-                background: #7f8c8d;
+                background: var(--neutral-dark);
             }
 
             .score {
                 font-size: 1.5em;
-                color: #667eea;
+                color: var(--primary-color);
                 font-weight: bold;
                 text-align: center;
                 margin: 20px 0;
@@ -403,7 +421,7 @@
             }
 
             .speak-btn-inline {
-                background: #667eea;
+                background: var(--primary-color);
                 color: white;
                 border: none;
                 border-radius: 20px;
@@ -415,7 +433,7 @@
             }
 
             .speak-btn-inline:hover {
-                background: #764ba2;
+                background: var(--accent-color);
                 transform: scale(1.05);
             }
 
@@ -827,7 +845,7 @@
                 const dialogue = dialogues[currentDialogue];
                 const content = document.getElementById("dialogue-content");
 
-                let html = `<h3 style="color: #667eea; margin: 15px 0 10px 0">${dialogue.title}</h3>`;
+                let html = `<h3 style="color: var(--primary-color); margin: 15px 0 10px 0">${dialogue.title}</h3>`;
 
                 dialogue.questions.forEach((q, index) => {
                     const inputId = `dialogue-${currentDialogue}-${index}`;
