@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="fi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ranskan kielen harjoitukset - Interaktiivinen sovellus</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }
+
+            .nav {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding: 20px;
+                background: #f8f9fa;
+                flex-wrap: wrap;
+            }
+
+            @media (max-width: 768px) {
+                .nav {
+                    padding: 10px;
+                    gap: 8px;
+                }
+            }
+
+            .nav-btn {
+                padding: 12px 24px;
+                border: none;
+                background: #667eea;
+                color: white;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s;
+            }
+
+            .nav-btn:hover {
+                background: #764ba2;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-btn.active {
+                background: #764ba2;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .content {
+                padding: 40px;
+                min-height: 500px;
+            }
+
+            @media (max-width: 768px) {
+                .content {
+                    padding: 15px;
+                    min-height: auto;
+                }
+            }
+
+            .section {
+                display: none;
+            }
+
+            .section.active {
+                display: block;
+                animation: fadeIn 0.5s;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Flashcard styles */
+            .flashcard-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .flashcard {
+                width: 100%;
+                max-width: 500px;
+                height: 300px;
+                perspective: 1000px;
+                cursor: pointer;
+            }
+
+            .flashcard-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+
+            .flashcard.flipped .flashcard-inner {
+                transform: rotateY(180deg);
+            }
+
+            .flashcard-front,
+            .flashcard-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                font-size: 2em;
+                font-weight: bold;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .flashcard-front {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .flashcard-back {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                transform: rotateY(180deg);
+            }
+
+            .flashcard-controls {
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .control-btn {
+                padding: 12px 30px;
+                border: none;
+                border-radius: 25px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .prev-btn {
+                background: #95a5a6;
+                color: white;
+            }
+
+            .next-btn {
+                background: #27ae60;
+                color: white;
+            }
+
+            .prev-btn:hover,
+            .next-btn:hover {
+                transform: scale(1.05);
+            }
+
+            .card-counter {
+                font-size: 18px;
+                color: #666;
+                font-weight: bold;
+            }
+
+            .hint {
+                color: #999;
+                font-style: italic;
+                margin-top: 20px;
+            }
+
+            /* Exercise styles */
+            .exercise-box {
+                background: #f8f9fa;
+                padding: 25px;
+                border-radius: 15px;
+                margin: 20px 0;
+                border-left: 5px solid #667eea;
+            }
+
+            .exercise-title {
+                font-size: 1.5em;
+                color: #667eea;
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
+
+            @media (max-width: 768px) {
+                .exercise-title {
+                    font-size: 1.2em;
+                    margin-bottom: 15px;
+                }
+
+                .exercise-box h3 {
+                    font-size: 1em;
+                    margin: 15px 0 10px 0 !important;
+                }
+            }
+
+            .question {
+                margin: 15px 0;
+                padding: 15px;
+                background: white;
+                border-radius: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .question {
+                    margin: 10px 0;
+                    padding: 12px;
+                }
+            }
+
+            .question-text {
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #2c3e50;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                transition: border-color 0.3s;
+            }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            input.correct {
+                border-color: #27ae60;
+                background: #d4edda;
+            }
+
+            input.incorrect {
+                border-color: #e74c3c;
+                background: #f8d7da;
+            }
+
+            .check-btn {
+                padding: 15px 40px;
+                border: none;
+                background: #667eea;
+                color: white;
+                border-radius: 25px;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+                margin-top: 20px;
+                transition: all 0.3s;
+            }
+
+            .check-btn:hover {
+                background: #764ba2;
+                transform: translateY(-2px);
+            }
+
+            .feedback {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 10px;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .feedback.success {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            .feedback.error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+
+            /* Matching exercise styles */
+            .matching-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin: 20px 0;
+            }
+
+            .matching-item {
+                padding: 15px;
+                background: white;
+                border: 3px solid #ddd;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .matching-item:hover {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .matching-item.selected {
+                border-color: #667eea;
+                background: #e3f2fd;
+            }
+
+            .matching-item.correct {
+                border-color: #27ae60;
+                background: #d4edda;
+            }
+
+            .matching-item.incorrect {
+                border-color: #e74c3c;
+                background: #f8d7da;
+            }
+
+            .reset-btn {
+                padding: 12px 30px;
+                border: none;
+                background: #95a5a6;
+                color: white;
+                border-radius: 25px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                margin-top: 20px;
+                transition: all 0.3s;
+            }
+
+            .reset-btn:hover {
+                background: #7f8c8d;
+            }
+
+            .score {
+                font-size: 1.5em;
+                color: #667eea;
+                font-weight: bold;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            /* Speech button styles */
+            .speak-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                cursor: pointer;
+                transition: all 0.3s;
+                backdrop-filter: blur(10px);
+            }
+
+            .speak-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+
+            .speak-btn-inline {
+                background: #667eea;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 12px;
+                font-size: 14px;
+                cursor: pointer;
+                margin-left: 10px;
+                transition: all 0.3s;
+            }
+
+            .speak-btn-inline:hover {
+                background: #764ba2;
+                transform: scale(1.05);
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    border-radius: 0;
+                }
+
+                .header {
+                    display: none;
+                }
+
+                .content {
+                    padding: 20px;
+                }
+
+                .flashcard {
+                    height: 250px;
+                }
+
+                .flashcard-front,
+                .flashcard-back {
+                    font-size: 1.5em;
+                }
+
+                .flashcard-controls {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                .control-btn {
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    flex: 1;
+                    min-width: 120px;
+                }
+
+                .card-counter {
+                    flex-basis: 100%;
+                    text-align: center;
+                    font-size: 18px;
+                    order: -1;
+                }
+
+                .matching-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .speak-btn {
+                    width: 35px;
+                    height: 35px;
+                    font-size: 16px;
+                }
+
+                .speak-btn-inline {
+                    padding: 6px 10px;
+                    font-size: 12px;
+                    margin-left: 5px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🇬🇧 Englannin kielen harjoitukset 🇬🇧</h1>
+                <p>Interaktiivinen oppimissovellus</p>
+            </div>
+
+            <div class="nav">
+                <button
+                    class="nav-btn active"
+                    onclick="showSection('flashcards')"
+                >
+                    Flash Cardit
+                </button>
+                <button class="nav-btn" onclick="showSection('dialogue')">
+                    Keskustelut
+                </button>
+            </div>
+
+            <div class="content">
+                <!-- Flashcards Section -->
+                <div id="flashcards" class="section active">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="flipCard()">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <span id="card-front">popcorn</span>
+                                    <button
+                                        class="speak-btn"
+                                        onclick="event.stopPropagation(); speakEnglish(document.getElementById('card-front').textContent)"
+                                    >
+                                        🔊
+                                    </button>
+                                </div>
+                                <div class="flashcard-back">
+                                    <span id="card-back">popcorn</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="hint">💡 Klikkaa korttia kääntääksesi sen</p>
+                        <div class="flashcard-controls">
+                            <button
+                                class="control-btn prev-btn"
+                                onclick="prevCard()"
+                            >
+                                ◀ Edellinen
+                            </button>
+                            <span class="card-counter" id="card-counter"
+                                >1 / 73</span
+                            >
+                            <button
+                                class="control-btn next-btn"
+                                onclick="nextCard()"
+                            >
+                                Seuraava ▶
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Section -->
+                <div id="dialogue" class="section">
+                    <div class="exercise-box">
+                        <div class="exercise-title">Täydennä keskustelu</div>
+
+                        <div id="dialogue-content">
+                            <!-- Generated by JavaScript -->
+                        </div>
+
+                        <div class="flashcard-controls" style="margin-top: 20px;">
+                            <button
+                                class="control-btn prev-btn"
+                                onclick="prevDialogue()"
+                            >
+                                ◀ Edellinen
+                            </button>
+                            <span class="card-counter" id="dialogue-counter"
+                                >1 / 6</span
+                            >
+                            <button
+                                class="control-btn next-btn"
+                                onclick="nextDialogue()"
+                            >
+                                Seuraava ▶
+                            </button>
+                        </div>
+
+                        <button
+                            class="check-btn"
+                            onclick="checkCurrentDialogue()"
+                            style="margin-top: 15px;"
+                        >
+                            Tarkista vastaukset
+                        </button>
+                        <div id="dialogue-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Speech synthesis setup
+            let speech = null;
+
+            function initSpeech() {
+                if ("speechSynthesis" in window) {
+                    speech = window.speechSynthesis;
+                    return true;
+                }
+                return false;
+            }
+
+            function speakEnglish(text) {
+                if (!speech) return;
+
+                // Stop any ongoing speech
+                speech.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "en-GB";
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                // Try to find the best British English voice
+                const voices = speech.getVoices();
+
+                // First try to find Jamie (best quality en-GB voice on iOS)
+                let englishVoice = voices.find(voice => voice.name === "Jamie");
+
+                // Fallback to any en-GB voice
+                if (!englishVoice) {
+                    englishVoice = voices.find(voice => voice.lang.startsWith("en-GB"));
+                }
+
+                // Fallback to any English voice
+                if (!englishVoice) {
+                    englishVoice = voices.find(voice =>
+                        voice.lang.startsWith("en") ||
+                        voice.name.toLowerCase().includes("english")
+                    );
+                }
+
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                }
+
+                speech.speak(utterance);
+            }
+
+            // Flashcard data - English vocabulary from Chapters 5, 6, and 7
+            const flashcards = [
+                // Chapter 5 - Food and feelings
+                { front: "popcorn", back: "popcornia" },
+                { front: "hamburgers", back: "hampurilaisia" },
+                { front: "chips", back: "ranskalaisia perunoita" },
+                { front: "pizza", back: "pitsaa" },
+                { front: "ice cream", back: "jäätelöä" },
+                { front: "cake", back: "kakkua" },
+                { front: "juice", back: "mehua" },
+                { front: "milkshake", back: "pirtelöä" },
+                { front: "hot", back: "kuuma" },
+                { front: "cold", back: "kylmä" },
+                { front: "hungry", back: "nälkäinen" },
+                { front: "thirsty", back: "janoinen" },
+                { front: "toast", back: "paahtoleipä" },
+                { front: "muffins", back: "kuppikakut" },
+                { front: "cookies", back: "keksit" },
+                { front: "crisps", back: "sipsit" },
+                { front: "hot dogs", back: "hot dogit" },
+                { front: "coffee", back: "kahvi" },
+                { front: "tea", back: "tee" },
+                { front: "cola", back: "kola" },
+                { front: "hot chocolate", back: "kaakao" },
+                // Chapter 6 - More food and meals
+                { front: "drink", back: "juoda" },
+                { front: "eat", back: "syödä" },
+                { front: "spaghetti", back: "spagettia" },
+                { front: "chicken", back: "kana" },
+                { front: "potatoes", back: "perunat" },
+                { front: "salad", back: "salaatti" },
+                { front: "fish and chips", back: "kalaa ja ranskalaisia perunoita" },
+                { front: "milk", back: "maito" },
+                { front: "water", back: "vesi" },
+                { front: "orange juice", back: "appelsiinimehu" },
+                { front: "apple juice", back: "omenamehu" },
+                { front: "rice", back: "riisi" },
+                { front: "soup", back: "keitto" },
+                { front: "carrots", back: "porkkanat" },
+                { front: "tomatoes", back: "tomaatit" },
+                { front: "meatballs", back: "lihapullat" },
+                { front: "sandwiches", back: "voileivät" },
+                { front: "bananas", back: "banaanit" },
+                { front: "ice tea", back: "jäätee" },
+                // Chapter 7 - House and prepositions
+                { front: "in", back: "sisällä" },
+                { front: "on", back: "päällä" },
+                { front: "under", back: "alla" },
+                { front: "behind", back: "takana" },
+                { front: "a house", back: "talo" },
+                { front: "a bathroom", back: "kylpyhuone" },
+                { front: "a bedroom", back: "makuuhuone" },
+                { front: "a bed", back: "sänky" },
+                { front: "a lamp", back: "lamppu" },
+                { front: "a living room", back: "olohuone" },
+                { front: "a sofa", back: "sohva" },
+                { front: "a kitchen", back: "keittiö" },
+                { front: "a chair", back: "tuoli" },
+                { front: "a table", back: "pöytä" },
+                { front: "thirteen", back: "kolmetoista" },
+                { front: "fourteen", back: "neljätoista" },
+                { front: "fifteen", back: "viisitoista" },
+                { front: "sixteen", back: "kuusitoista" },
+                { front: "seventeen", back: "seitsemäntoista" },
+                { front: "eighteen", back: "kahdeksantoista" },
+                { front: "nineteen", back: "yhdeksäntoista" },
+                { front: "twenty", back: "kaksikymmentä" },
+                { front: "next to", back: "vieressä" },
+                { front: "a carpet", back: "matto" },
+                { front: "a shower", back: "suihku" },
+                { front: "a toilet", back: "WC" },
+                { front: "a TV", back: "televisio" },
+                { front: "in front of", back: "edessä" },
+                { front: "a laptop", back: "kannettava tietokone" },
+                { front: "a door", back: "ovi" },
+                { front: "a wall", back: "seinä" },
+                { front: "a window", back: "ikkuna" },
+            ];
+
+            let currentCard = 0;
+            let isFlipped = false;
+
+            // Navigation
+            function showSection(sectionId) {
+                document
+                    .querySelectorAll(".section")
+                    .forEach((s) => s.classList.remove("active"));
+                document
+                    .querySelectorAll(".nav-btn")
+                    .forEach((b) => b.classList.remove("active"));
+
+                document.getElementById(sectionId).classList.add("active");
+                event.target.classList.add("active");
+            }
+
+            // Flashcard functions
+            function updateCard() {
+                // If card is flipped, first flip it back, then update content after animation
+                if (isFlipped) {
+                    document
+                        .querySelector(".flashcard")
+                        .classList.remove("flipped");
+                    isFlipped = false;
+                    
+                    // Wait for flip animation to complete before updating content
+                    setTimeout(() => {
+                        document.getElementById("card-front").textContent =
+                            flashcards[currentCard].front;
+                        document.getElementById("card-back").textContent =
+                            flashcards[currentCard].back;
+                        document.getElementById("card-counter").textContent =
+                            `${currentCard + 1} / ${flashcards.length}`;
+                    }, 300); // Match the CSS transition duration (0.6s / 2 = 0.3s for half flip)
+                } else {
+                    // If not flipped, update immediately
+                    document.getElementById("card-front").textContent =
+                        flashcards[currentCard].front;
+                    document.getElementById("card-back").textContent =
+                        flashcards[currentCard].back;
+                    document.getElementById("card-counter").textContent =
+                        `${currentCard + 1} / ${flashcards.length}`;
+                }
+            }
+
+            function flipCard() {
+                document
+                    .querySelector(".flashcard")
+                    .classList.toggle("flipped");
+                isFlipped = !isFlipped;
+            }
+
+            function nextCard() {
+                currentCard = (currentCard + 1) % flashcards.length;
+                updateCard();
+            }
+
+            function prevCard() {
+                currentCard =
+                    (currentCard - 1 + flashcards.length) % flashcards.length;
+                updateCard();
+            }
+
+            // Dialogue exercise
+            const dialogues = [
+                {
+                    title: "Keskustelu 1",
+                    questions: [
+                        { speaker: "🐿️", text: "________?", hint: "(Haluatko)Pirtelöä?", answers: ["milkshake"] },
+                        { speaker: "🐭", text: "________, ________.", hint: "Ei, kiitos.", answers: ["no thanks", "no, thanks"] }
+                    ]
+                },
+                {
+                    title: "Keskustelu 2",
+                    questions: [
+                        { speaker: "🐿️", text: "________?", hint: "(Haluatko) Ranskalaisia perunoita?", answers: ["chips"] },
+                        { speaker: "🐭", text: "________, ________.", hint: "Kyllä, kiitos.", answers: ["yes please", "yes, please"] }
+                    ]
+                },
+                {
+                    title: "Keskustelu 3",
+                    questions: [
+                        { speaker: "🐭", text: "________, ________.", hint: "Spagettia, kiitos.", answers: ["spaghetti please", "spaghetti, please"] },
+                        { speaker: "🐿️", text: "________ ________ ________.", hint: "Tässä olkaa hyvä / Ole hyvä.", answers: ["here you are"] },
+                        { speaker: "🐭", text: "________ ________.", hint: "Kiitos.", answers: ["thank you"] }
+                    ]
+                },
+                {
+                    title: "Keskustelu 4",
+                    questions: [
+                        { speaker: "🐿️", text: "________, ________.", hint: "Maitoa, kiitos.", answers: ["milk please", "milk, please"] },
+                        { speaker: "🐿️", text: "________ ________ ________ ________?", hint: "Maitoa vai appelsiinimehua?", answers: ["milk or orange juice"] }
+                    ]
+                },
+                {
+                    title: "Keskustelu 5",
+                    questions: [
+                        { speaker: "🐿️", text: "________ ________ ________?", hint: "Missä sinä olet?", answers: ["where are you"] },
+                        { speaker: "🐭", text: "________ ________ ________.", hint: "Keittiössä.", answers: ["in the kitchen"] }
+                    ]
+                },
+                {
+                    title: "Keskustelu 6",
+                    questions: [
+                        { speaker: "🐭", text: "________ ________ ________?", hint: "Missä on puhelimeni?", answers: ["where's my phone", "where is my phone"] },
+                        { speaker: "🐿️", text: "________ ________ ________.", hint: "Pöydällä.", answers: ["on the table", "on the desk"] }
+                    ]
+                }
+            ];
+
+            let currentDialogue = 0;
+
+            function normalizeAnswer(answer) {
+                return answer.toLowerCase().trim().replace(/[!?.,']/g, "");
+            }
+
+            function updateDialogue() {
+                const dialogue = dialogues[currentDialogue];
+                const content = document.getElementById("dialogue-content");
+
+                let html = `<h3 style="color: #667eea; margin: 15px 0 10px 0">${dialogue.title}</h3>`;
+
+                dialogue.questions.forEach((q, index) => {
+                    const inputId = `dialogue-${currentDialogue}-${index}`;
+                    html += `
+                        <div class="question">
+                            <div class="question-text">
+                                ${q.speaker}: ${q.text} ${q.hint}
+                            </div>
+                            <input
+                                type="text"
+                                id="${inputId}"
+                                placeholder="Englannin sanat..."
+                            />
+                        </div>
+                    `;
+                });
+
+                content.innerHTML = html;
+
+                // Update counter
+                document.getElementById("dialogue-counter").textContent =
+                    `${currentDialogue + 1} / ${dialogues.length}`;
+
+                // Clear feedback
+                document.getElementById("dialogue-feedback").textContent = "";
+            }
+
+            function checkCurrentDialogue() {
+                const dialogue = dialogues[currentDialogue];
+                let correct = 0;
+                const total = dialogue.questions.length;
+
+                dialogue.questions.forEach((q, index) => {
+                    const inputId = `dialogue-${currentDialogue}-${index}`;
+                    const input = document.getElementById(inputId);
+                    const userAnswer = normalizeAnswer(input.value);
+                    const correctAnswers = q.answers.map(normalizeAnswer);
+
+                    if (correctAnswers.includes(userAnswer)) {
+                        input.className = "correct";
+                        correct++;
+                    } else {
+                        input.className = "incorrect";
+                    }
+                });
+
+                const feedback = document.getElementById("dialogue-feedback");
+                if (correct === total) {
+                    feedback.className = "feedback success";
+                    feedback.textContent = `🎉 Loistavaa! Sait kaikki ${correct}/${total} oikein!`;
+                } else {
+                    feedback.className = "feedback error";
+                    feedback.textContent = `Sait ${correct}/${total} oikein. Yritä vielä kerran!`;
+                }
+            }
+
+            function nextDialogue() {
+                currentDialogue = (currentDialogue + 1) % dialogues.length;
+                updateDialogue();
+            }
+
+            function prevDialogue() {
+                currentDialogue = (currentDialogue - 1 + dialogues.length) % dialogues.length;
+                updateDialogue();
+            }
+
+            // Initialize on page load
+            window.onload = function () {
+                updateCard();
+                updateDialogue();
+                initSpeech();
+            };
+        </script>
+    </body>
+</html>
